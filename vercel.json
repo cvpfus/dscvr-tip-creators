@@ -1,0 +1,13 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "connect-src https://*.solana.com/ https://rpc.hellomoon.io https://simple-server-chi.vercel.app https://actions-registry.dial.to/all https://*.trycloudflare.com https://omen.*.ts.net https://proxy.dial.to/?url=https%3A%2F%2Fomen.*.ts.net%2Factions.json; "
+        }
+      ]
+    }
+  ]
+}
