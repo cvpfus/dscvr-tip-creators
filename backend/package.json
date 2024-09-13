@@ -1,0 +1,20 @@
+{
+  "name": "tip-solana-actions",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "node --watch index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@dfinity/agent": "^2.0.0",
+    "@solana/actions": "^1.6.4",
+    "@solana/web3.js": "^1.95.3",
+    "axios": "^1.7.5",
+    "express": "^4.19.2"
+  }
+}
