@@ -87,6 +87,13 @@ export class Adapter {
       this.canvasClient = canvasClient;
     }
 
+    this.metadata = {
+      supportedBlockchainIds: [
+        "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+        "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      ],
+    };
+
     this.chainId = chainId;
   }
 

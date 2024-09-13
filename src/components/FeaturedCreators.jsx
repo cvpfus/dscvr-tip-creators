@@ -12,40 +12,36 @@ import {
   CommandList,
 } from "@/components/ui/command.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import { RefreshCw, Loader2 } from "lucide-react";
-import { ACTION_API_URL, SOLANA_USERS } from "@/constants/index.js";
-import { useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
+import { ACTION_API_URL } from "@/constants/index.js";
+import { useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { USER_WALLET_ADDRESS } from "@/queries/index.js";
-import { formatFollowerCount, shuffleArray } from "@/lib/utils.js";
+import { cn, formatFollowerCount, shuffleArray } from "@/lib/utils.js";
+import { Skeleton } from "@/components/ui/skeleton.jsx";
+import { useStore } from "@/hooks/useStore.js";
 
-const RecommendedCreators = ({ refetch, setIsLoaded }) => {
-  const [results, setResults] = useState([]);
-  const [topTen, setTopTen] = useState([]);
+const FeaturedCreators = ({
+  refetch,
+  setIsLoaded,
+  setExpandedItems,
+  className,
+}) => {
+  const featuredResults = useStore((state) => state.featuredResults);
+  const topTen = useStore((state) => state.topTen);
+  const setFeaturedResults = useStore((state) => state.setFeaturedResults);
+  const setTopTen = useStore((state) => state.setTopTen);
+
   const [execute] = useLazyQuery(USER_WALLET_ADDRESS);
 
   useEffect(() => {
-    const queryAll = async () => {
-      const results = await Promise.all(
-        shuffleArray(SOLANA_USERS).map((user) =>
-          execute({ variables: { name: user } }),
-        ),
-      );
-      const filteredResults = results
-        .filter((res) => res.data)
-        .map((res) => res.data.userByName);
-
-      const topTenCreators = filteredResults.slice(0, 10);
-
-      setTopTen(topTenCreators);
-      setResults(filteredResults);
-    };
-
-    queryAll();
+    if (featuredResults.length === 0) {
+      setFeaturedResults(execute);
+    }
   }, [USER_WALLET_ADDRESS]);
 
   const handleRefresh = () => {
-    const topTen = shuffleArray(results).slice(0, 10);
+    const topTen = shuffleArray(featuredResults).slice(0, 10);
     setTopTen(topTen);
   };
 
@@ -56,11 +52,13 @@ const RecommendedCreators = ({ refetch, setIsLoaded }) => {
 
     setIsLoaded(false);
 
+    setExpandedItems([]);
+
     await refetch(updatedUrl);
   };
 
   return (
-    <Card className="rounded-2xl mt-4">
+    <Card className={cn("rounded-2xl mt-4", className)}>
       <CardHeader>
         <CardTitle>Featured creators</CardTitle>
         <CardDescription>
@@ -75,8 +73,16 @@ const RecommendedCreators = ({ refetch, setIsLoaded }) => {
         >
           <RefreshCw className="w-4 h-4 mr-2" /> Refresh
         </Button>
+
         {topTen.length === 0 && (
-          <Loader2 className="animate-spin self-center mt-4" />
+          <div className="flex flex-col items-center gap-3 mt-2">
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-9 w-full" />
+          </div>
         )}
 
         <Command>
@@ -118,4 +124,4 @@ const RecommendedCreators = ({ refetch, setIsLoaded }) => {
   );
 };
 
-export default RecommendedCreators;
+export default FeaturedCreators;

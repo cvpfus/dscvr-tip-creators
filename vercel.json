@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "connect-src https://*.solana.com/ https://rpc.hellomoon.io https://simple-server-chi.vercel.app https://actions-registry.dial.to/all https://*.trycloudflare.com https://omen.*.ts.net https://proxy.dial.to/?url=https%3A%2F%2Fomen.*.ts.net%2Factions.json; "
+          "value": "connect-src https://*.solana.com/ https://rpc.hellomoon.io https://simple-server-chi.vercel.app https://tip-solana-actions.vercel.app https://actions-registry.dial.to https://proxy.dial.to https://cvpfus.xyz https://edge1-proxy.dscvr.cloud; img-src https://proxy.dial.to https://ui-avatars.com https://images.dscvr.one;"
         }
       ]
     }

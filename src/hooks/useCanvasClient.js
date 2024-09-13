@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { CanvasClient } from "@dscvr-one/canvas-client-sdk";
-import { registerCanvasWallet } from "@dscvr-one/canvas-wallet-adapter";
 
 export function useCanvasClient() {
   const [state, setState] = useState({
@@ -17,10 +16,8 @@ export function useCanvasClient() {
     initializationStartedRef.current = true;
 
     async function initializeCanvas() {
-      const client = new CanvasClient();
-      // registerCanvasWallet(client);
-
       try {
+        const client = new CanvasClient();
         const response = await client.ready();
         setState({
           client,

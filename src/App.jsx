@@ -1,30 +1,35 @@
-import { useEffect, useState } from "react";
-import Login from "./components/Login.jsx";
+import { useState } from "react";
 import "@dialectlabs/blinks/index.css";
 import "./index.css";
-import { Action, Blink } from "@dialectlabs/blinks";
+import { Blink } from "@dialectlabs/blinks";
 import { Adapter } from "./Adapter.js";
 import { useCanvasClient } from "./hooks/useCanvasClient.js";
 import { ACTION_API_URL } from "./constants/index.js";
 import { useResizeObserver } from "./hooks/useResizeObserver.js";
 import FindCreator from "@/components/FindCreator.jsx";
-import RecommendedCreators from "@/components/RecommendedCreators.jsx";
+import FeaturedCreators from "@/components/FeaturedCreators.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import { useAction } from "@dialectlabs/blinks";
 import { useCustomAction } from "@/hooks/useCustomAction.js";
+import { Analytics } from "@vercel/analytics/react";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton.jsx";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion.jsx";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const [loaded, setIsLoaded] = useState(true);
+  const [expandedItems, setExpandedItems] = useState([]);
 
-  const { client, isReady } = useCanvasClient();
+  const { client, user, isReady } = useCanvasClient();
 
   useResizeObserver(client);
 
   let adapter;
 
-  if (client) {
+  if (isReady) {
     adapter = new Adapter(client);
   }
 
@@ -34,10 +39,7 @@ const App = () => {
       adapter,
     });
 
-  if (!isLoggedIn)
-    return <Login setIsLoggedIn={setIsLoggedIn} adapter={adapter} />;
-
-  if (isLoading)
+  if (!action)
     return <Loader2 className="flex justify-center animate-spin w-full mt-8" />;
 
   const handleRefreshBlinks = async () => {
@@ -46,33 +48,88 @@ const App = () => {
   };
 
   return (
-    <div className="flex m-4">
+    <div className="flex m-4 flex-col md:flex-row items-center md:justify-center md:items-start">
+      <Analytics />
       <div className="flex flex-col max-w-[400px] w-full">
         <Button
           onClick={handleRefreshBlinks}
-          className="mb-2 rounded-2xl shadow"
-          variant="outline"
+          className="mb-2 rounded-2xl shadow mt-4 md:mt-0"
         >
           Refresh Blinks
         </Button>
         <div className="relative">
-          {isLoaded ? (
+          {isLoaded && action ? (
             <Blink
               action={action}
-              websiteText={new URL(ACTION_API_URL).host}
+              websiteText={new URL(action.url).hostname}
               securityLevel="all"
             />
           ) : (
-            <div className="absolute left-1/2 transform translate-x-1/2 top-8">
-              <Loader2 className="animate-spin" />
+            <div className="rounded-2xl shadow border p-4 flex flex-col items-center">
+              <Skeleton className="w-full h-[350px]" />
+              <Skeleton className="w-28 h-5 self-start mt-4" />
+              <Skeleton className="w-32 h-5 self-start mt-4" />
+              <Skeleton className="w-20 h-3 self-start mt-2" />
+              <Skeleton className="w-40 h-3 self-start mt-4" />
+              <Skeleton className="w-36 h-3 self-start mt-2" />
+              <Skeleton className="w-40 h-3 self-start mt-2" />
+              <Skeleton className="w-36 h-3 self-start mt-2" />
+              <div className="w-full flex gap-3">
+                <Skeleton className="w-1/2 h-8 self-start mt-4" />
+                <Skeleton className="w-1/2 h-8 self-start mt-4" />
+              </div>
+              <Skeleton className="w-full h-8 self-start mt-4" />
+              <Skeleton className="w-full h-12 self-start mt-4" />
             </div>
           )}
         </div>
       </div>
 
-      <div className="ml-4 h-full">
-        <FindCreator refetch={refetch} setIsLoaded={setIsLoaded} />
-        <RecommendedCreators refetch={refetch} setIsLoaded={setIsLoaded} />
+      <div className="ml-0 my-4 h-full max-w-[400px] md:max-w-md md:ml-4 md:my-0 order-first md:order-last w-full">
+        <FindCreator
+          className="hidden md:block"
+          refetch={refetch}
+          setIsLoaded={setIsLoaded}
+          user={user}
+          setExpandedItems={setExpandedItems}
+        />
+        <FeaturedCreators
+          className="hidden md:block"
+          refetch={refetch}
+          setIsLoaded={setIsLoaded}
+          setExpandedItems={setExpandedItems}
+        />
+        <Accordion
+          className="md:hidden"
+          type="multiple"
+          collapsible="true"
+          value={expandedItems}
+          onValueChange={setExpandedItems}
+        >
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Find creator</AccordionTrigger>
+            <AccordionContent>
+              <FindCreator
+                className="block md:block"
+                refetch={refetch}
+                setIsLoaded={setIsLoaded}
+                user={user}
+                setExpandedItems={setExpandedItems}
+              />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Featured Creators</AccordionTrigger>
+            <AccordionContent>
+              <FeaturedCreators
+                className="block md:block"
+                refetch={refetch}
+                setIsLoaded={setIsLoaded}
+                setExpandedItems={setExpandedItems}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   );
